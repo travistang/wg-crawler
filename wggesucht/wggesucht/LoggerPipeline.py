@@ -36,6 +36,12 @@ class LoggerPipeline(object):
                 self.crawler.engine.crawl(
                     scrapy.Request(
                         url = 'https://www.wg-gesucht.de/{}.html'.format(aid),
-                        callback = O.OfferSpider.ad_parse),
+                        callback = O.OfferSpider.ad_parse,
+                        errback = DatasetBroker.DatasetBroker.add_exception),
                 spider)
-        raise DropItem('Ignoring item {}'.format(item))
+                return item
+        elif 'ip' in item:
+            DatasetBroker.DatasetBroker.add_proxy(item)
+            return item
+        else:
+            raise DropItem('Ignoring item {}'.format(item))

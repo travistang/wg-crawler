@@ -46,12 +46,12 @@ class OfferSpider(scrapy.Spider):
             return
 
         # proceed to sending message
-        id = re.search(r'[0-9]{7}',this_url).group(0)
+        id = re.search(r'[0-9]{6,7}',this_url).group(0)
         # log the ad id so it wont be visited again
         yield {'ad':id}
         # prepare form input
         msg_url = "https://www.wg-gesucht.de/en/nachricht-senden.html?id={}".format(id)
-        request = scrapy.Request(msg_url,method = 'GET',callback = cls.msg_page)
+        request = scrapy.Request(msg_url,method = 'GET',callback = cls.msg_page,errback = DatasetBroker.DatasetBroker.add_exception)
         yield request
 
     @classmethod
@@ -78,7 +78,7 @@ class OfferSpider(scrapy.Spider):
         else:
             print 'send something...'
             exit()
-            yield scrapy.FormRequest.from_response(response,formname = 'msg_form',formdata = form_data)
+            yield scrapy.FormRequest.from_response(response,formname = 'msg_form',formdata = form_data,errback = DatasetBroker.DatasetBroker.add_exception)
 
     # functions for dealing with some specific infos of pages
     @classmethod

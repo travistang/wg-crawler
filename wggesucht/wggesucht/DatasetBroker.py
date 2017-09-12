@@ -8,7 +8,7 @@ class DatasetBroker(object):
     url = "http://localhost:1337/parse/"
     header = {
         "X-Parse-Application-Id": "wggesucht",
-        "X-Parse-REST-API-Key": "wggesucht",
+        "X-Parse-Master-Key": "wggesucht",
         "Content-Type": "application/json",
     }
 
@@ -23,6 +23,23 @@ class DatasetBroker(object):
     def add_object(cls,class_name,data):
         url = cls.url + 'classes/' + class_name
         return cls.post(url,data)
+
+    @classmethod
+    def add_exception(cls,exp):
+        url = cls.url + 'classes/' + 'Exceps'
+        print 'sending request to ' + url
+        return cls.post(url,{'excep':repr(exp)})
+
+    @classmethod
+    def clear_proxy(cls):
+        url = cls.url + 'purge/Proxies'
+        r = requests.delete(url,headers = cls.header)
+
+    @classmethod
+    def add_proxy(cls,proxy):
+        url = cls.url + 'classes/Proxies'
+        return cls.post(url,proxy)
+        # r = requests.post(url,params = proxy,headers = cls.header)
 
     @classmethod
     def is_ad_new(cls,r):

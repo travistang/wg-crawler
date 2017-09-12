@@ -24,6 +24,9 @@ class RedirectHandler(object):
 		# do not rotate proxy when it is going to send message
 		if 'nachricht-senden' in request.url:
 			return
+		# no proxies for crawling proxy list...
+		if 'sslproxies.org' in request.url:
+			return
 
 		request.meta['proxy'] = self.get_random_proxy()
 		# return request
@@ -33,6 +36,9 @@ class RedirectHandler(object):
 		return response
 
 	def process_exception(self,request,exception,spider):
+		# log the exception
+		DatasetBroker.DatasetBroker.add_exception(exception)
+		# and rotate proxy and try again
 		proxy = self.get_random_proxy()
 		new_req = scrapy.Request(request.url,spider.parse)
 		new_req.meta['proxy'] = proxy
