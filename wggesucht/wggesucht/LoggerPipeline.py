@@ -1,12 +1,20 @@
 from scrapy.exceptions import DropItem
-
+import scrapy
 import urllib
 import urllib2
 import json
 from . import DatasetBroker
+import re
+from spiders import offer as O
 class LoggerPipeline(object):
     # internal class for storing database object defs...
     # structs for storing ads
+    def __init__(self, crawler):
+        self.crawler = crawler
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler)
 
     def open_spider(self, spider):
         pass
@@ -17,10 +25,17 @@ class LoggerPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        if item['ad']:
+        if 'ad' in item:
             # the item is an ad...
             DatasetBroker.DatasetBroker.add_object("Ads",item)
             return item
+        elif 'ad_url' in item:
+            # check if the item should be followed...
+            if DatasetBroker.DatasetBroker.is_ad_new(item['ad_url']):
+                aid = re.search(r'[0-9]{6,7}',item['ad_url']).group(0)
+                self.crawler.engine.crawl(
+                    scrapy.Request(
+                        url = 'https://www.wg-gesucht.de/{}.html'.format(aid),
+                        callback = O.OfferSpider.ad_parse),
+                spider)
         raise DropItem('Ignoring item {}'.format(item))
-
-    # This should directly be called by RedirectHandler

@@ -27,37 +27,35 @@ class OfferSpider(scrapy.Spider):
         res = sel.xpath('//div[@id="main_content"]//div[re:test(@id,"liste-details-ad-[0-9]+")]//a[@class="detailansicht"]/@href').extract()
         # now get the url to each of the ads
         # and check whether it has been visited before
-        # get some unique IDs
-        res = list(set(res))
-        for r in res:
-            id = re.search(r'[0-9]{6,7}',r).group(0)
-            yield {'ad':id}
-            # TODO: uncomment me to follow the ads...
-            yield response.follow(r,self.ad_parse,dont_filter = True)
 
-    def ad_parse(self,response):
-        this_url = response.url
-        sel = Selector(response)
+        # get some unique ad lists
+        ad_lists = reduce(lambda l,r: l if r in l else l + [r],res,[])
+        for r in ad_lists:
+            # yield {'ad':id}
+            # yield response.follow(r,self.ad_parse,dont_filter = True)
+            yield {'ad_url': r}
+    @classmethod
+    def ad_parse(cls,response):
         # 1. get the renter's name..
         # BUG: this one will not work starting from September because the name field of the landlord has changed to images...
         # name = sel.xpath('//div[contains(@class,"rhs_contact_information")]//div[contains(@class,"text-capitalise")]/b/text()').extract_first()
         # first_name = HumanName(name.encode('ascii','replace')).first
-
+        this_url = response.url
         # 2. get availablity
-
-        if not self.is_date_in_criteria(response):
+        if not cls.is_date_in_criteria(response):
             return
 
         # proceed to sending message
         id = re.search(r'[0-9]{7}',this_url).group(0)
-        # TODO: remove me
-        return
+        # log the ad id so it wont be visited again
+        yield {'ad':id}
         # prepare form input
         msg_url = "https://www.wg-gesucht.de/en/nachricht-senden.html?id={}".format(id)
-        request = scrapy.Request(msg_url,method = 'GET',callback = self.msg_page)
+        request = scrapy.Request(msg_url,method = 'GET',callback = cls.msg_page)
         yield request
 
-    def msg_page(self,response):
+    @classmethod
+    def msg_page(cls,response):
         '''
             You needa write something about yourself to send the letters to landlords...
         '''
@@ -83,7 +81,8 @@ class OfferSpider(scrapy.Spider):
             yield scrapy.FormRequest.from_response(response,formname = 'msg_form',formdata = form_data)
 
     # functions for dealing with some specific infos of pages
-    def is_date_in_criteria(self,response):
+    @classmethod
+    def is_date_in_criteria(cls,response):
         start_date = response.xpath('//*[@id="main_column"]/div[1]/div/div[3]/div[3]/p/b[1]/text()').extract_first()
         end_date = response.xpath('//*[@id="main_column"]/div[1]/div/div[3]/div[3]/p/b[2]/text()').extract_first()
 

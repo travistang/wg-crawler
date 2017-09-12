@@ -24,20 +24,6 @@ class RedirectHandler(object):
 		# do not rotate proxy when it is going to send message
 		if 'nachricht-senden' in request.url:
 			return
-		# check if the ads has been seen before
-		try:
-			# check if there are ids in the request url
-			# if yes then its requesting an ad, check if it has been seen before
-			# otherwise let it go
-			id = re.search(r'[0-9]{6,7}',request.url).group(0)
-			if DatasetBroker.DatasetBroker.is_ad_seen({'ad':id}):
-				raise IgnoreRequest()
-		except Exception as e:
-			# let the IgnoreRequest exception passes through, so the request will be ignored..
-			if type(e) == IgnoreRequest:
-				raise e
-
-		print 'processed'
 
 		request.meta['proxy'] = self.get_random_proxy()
 		# return request

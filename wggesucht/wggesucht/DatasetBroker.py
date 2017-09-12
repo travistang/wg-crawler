@@ -1,7 +1,9 @@
 import urllib
 import urllib2
 import json
-from scrapy import Reuqest
+from scrapy.exceptions import IgnoreRequest
+import re
+import requests
 class DatasetBroker(object):
     url = "http://localhost:1337/parse/"
     header = {
@@ -23,12 +25,14 @@ class DatasetBroker(object):
         return cls.post(url,data)
 
     @classmethod
-    def request_if_ad_is_new(cls,ad):
-        url = cls.url + 'classes/' + "Ads?where={}"
+    def is_ad_new(cls,r):
+        print 'looking at {}'.format(r)
+        ad = re.search(r'[0-9]{6,7}',r).group(0)
+        params = {'where': json.dumps({'ad':ad})}
+        url = cls.url + 'classes/' + "Ads"
         # data = urllib.urlencode(ad)
-        data = urllib.urlencode(json.dumps(ad))
-        req = urllib2.Request(url.format(data),None,cls.header)
-        response = urllib2.urlopen(req)
-        print 'response is',response.read()
-        if len(response) == 0:
-            yield
+        r = requests.get(url,params = params,headers = cls.header)
+        print r.text
+        res = json.loads(r.text)
+        return len(res['results']) == 0
+        # return len(r.text) == ''
