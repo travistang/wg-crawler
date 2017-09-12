@@ -1,0 +1,13 @@
+.DS_Store
+proxy/
+proxy_list
+volumes/
+*.pyc
+*/ads/*
+*/dbs/*
+*.json
+*.bak
+*.html
+*.txt
+*log
+*sent_id
