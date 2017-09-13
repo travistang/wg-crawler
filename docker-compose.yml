@@ -138,4 +138,4 @@ crawler:
   build: ./wggesucht
   links:
     - parse-server
-  command: "yes" # intended to do nothing but blocks the container from exiting...
+  command: "python d.py"

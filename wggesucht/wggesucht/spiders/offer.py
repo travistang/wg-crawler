@@ -17,9 +17,9 @@ class OfferSpider(scrapy.Spider):
     name = 'offer'
     allowed_domains = ['www.wg-gesucht.de']
     url = 'http://www.wg-gesucht.de/en/wg-zimmer-in-Muenchen.90.0.1.0.html?offer_filter=1&sort_column=0&city_id=90&category=0&rent_type={}&rMax={}&wgSea=2&wgAge={}&sin=1&exc=2'.format(
-                settings.INFO['RENT_TYPE'] or 0,
-                settings.INFO['MAX_RENT'] or '',
-                settings.INFO['AGE'] or '')
+                settings.INFO['RENT_TYPE'] if 'RENT_TYPE' in settings.INFO else 0,
+                settings.INFO['MAX_RENT'] if 'MAX_RENT' in settings.INFO else '',
+                settings.INFO['AGE'] if 'AGE' in settings.INFO else '')
 
     start_urls = [url]
     def parse(self, response):
@@ -74,7 +74,7 @@ class OfferSpider(scrapy.Spider):
         if settings.INFO['DONT_SEND'] or False:
             print 'didnt send something...'
         else:
-            print 'send something...'
+            print 'sending letters now...'
             yield scrapy.FormRequest.from_response(response,formname = 'msg_form',formdata = form_data,errback = DatasetBroker.DatasetBroker.add_exception)
 
     # functions for dealing with some specific infos of pages
@@ -84,10 +84,10 @@ class OfferSpider(scrapy.Spider):
         end_date = response.xpath('//*[@id="main_column"]/div[1]/div/div[3]/div[3]/p/b[2]/text()').extract_first()
 
         to_date = lambda s: datetime.strptime(s,'%d.%m.%Y')
-        start_date_lowerbound = settings.INFO['MOVE_IN_DATE_EARLIEST'] or '1.1.1970'
-        start_date_upperbound = settings.INFO['MOVE_IN_DATE_LATEST'] or '1.1.2100'
-        end_date_lowerbound   = settings.INFO['MOVE_OUT_DATE_EARLIEST'] or '1.1.1970'
-        end_date_upperbound   = settings.INFO['MOVE_OUT_DATE_LATEST'] or '1.1.2100'
+        start_date_lowerbound = settings.INFO['MOVE_IN_DATE_EARLIEST'] if 'MOVE_IN_DATE_EARLIEST' in settings.INFO else '1.1.1970'
+        start_date_upperbound = settings.INFO['MOVE_IN_DATE_LATEST'] if 'MOVE_IN_DATE_LATEST' in settings.INFO else '1.1.2100'
+        end_date_lowerbound   = settings.INFO['MOVE_OUT_DATE_EARLIEST'] if 'MOVE_OUT_DATE_EARLIEST' in settings.INFO else '1.1.1970'
+        end_date_upperbound   = settings.INFO['MOVE_OUT_DATE_LATEST'] if 'MOVE_OUT_DATE_LATEST' in settings.INFO else '1.1.2100'
         try:
             if to_date(start_date_lowerbound) < to_date(start_date) < to_date(start_date_upperbound): return # too late, i will be living under the bridge..
             if to_date(end_date_lowerbound) < to_date(end_date) < to_date(end_date_upperbound): return

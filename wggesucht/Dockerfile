@@ -7,5 +7,5 @@ run pip install -r /wg/requirements.txt
 
 workdir /wg/wggesucht
 
-cmd ["yes"]
+cmd ["python" ,"d.py"]
 
