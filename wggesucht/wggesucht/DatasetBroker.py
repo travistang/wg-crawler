@@ -4,6 +4,7 @@ import json
 from scrapy.exceptions import IgnoreRequest
 import re
 import requests
+from random import shuffle
 class DatasetBroker(object):
     url = "http://localhost:1337/parse/"
     header = {
@@ -39,7 +40,18 @@ class DatasetBroker(object):
     def add_proxy(cls,proxy):
         url = cls.url + 'classes/Proxies'
         return cls.post(url,proxy)
-        # r = requests.post(url,params = proxy,headers = cls.header)
+
+    @classmethod
+    def get_proxy_list(cls):
+        url = cls.url + 'classes/Proxies'
+        r = requests.get(url,headers = cls.header)
+        res = json.loads(r.text)
+        shuffle(res['results'])
+        return iter(
+                    map(
+                        lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
+                        res['results']
+                        ))
 
     @classmethod
     def is_ad_new(cls,r):
@@ -49,7 +61,6 @@ class DatasetBroker(object):
         url = cls.url + 'classes/' + "Ads"
         # data = urllib.urlencode(ad)
         r = requests.get(url,params = params,headers = cls.header)
-        print r.text
         res = json.loads(r.text)
         return len(res['results']) == 0
         # return len(r.text) == ''

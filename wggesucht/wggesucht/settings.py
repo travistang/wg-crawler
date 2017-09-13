@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'wggesucht.spiders'
 
 RETRY_HTTP_CODES = [s for s in range(300,600) if s != 303]
 RETRY_TIMES = 20
-
+DOWNLOAD_TIMEOUT = 5
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'Mozilla/5.0 (Mobile; rv:26.0) Gecko/26.0 Firefox/26.0'
 

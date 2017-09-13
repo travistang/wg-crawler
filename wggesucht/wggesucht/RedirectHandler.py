@@ -9,15 +9,14 @@ import re
 
 class RedirectHandler(object):
 	def __init__(self):
-		with open('proxy_list') as pf:
-			proxies = map(lambda l: l.replace('\n',''),pf.readlines())
-			shuffle(proxies)
-			self.proxies = iter(proxies)
+		self.proxies = DatasetBroker.DatasetBroker.get_proxy_list()
+		# with open('proxy_list') as pf:
+		# 	proxies = map(lambda l: l.replace('\n',''),pf.readlines())
+		# 	shuffle(proxies)
+		# 	self.proxies = iter(proxies)
 
 	def get_random_proxy(self):
-		prox = self.proxies.next()
-		print prox
-		return prox
+		return self.proxies.next()
 
 	def process_request(self,request,spider):
 		# add with proxy if theres not any..
