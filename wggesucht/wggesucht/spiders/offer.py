@@ -16,12 +16,19 @@ from .. import DatasetBroker
 class OfferSpider(scrapy.Spider):
     name = 'offer'
     allowed_domains = ['www.wg-gesucht.de']
+    field_or_value = lambda n,v: settings.INFO[n] if n in settings.INFO else v
     url = 'http://www.wg-gesucht.de/en/wg-zimmer-in-Muenchen.90.0.1.0.html?offer_filter=1&sort_column=0&city_id=90&category=0&rent_type={}&rMax={}&wgSea=2&wgAge={}&sin=1&exc=2'.format(
-                settings.INFO['RENT_TYPE'] if 'RENT_TYPE' in settings.INFO else 0,
-                settings.INFO['MAX_RENT'] if 'MAX_RENT' in settings.INFO else '',
-                settings.INFO['AGE'] if 'AGE' in settings.INFO else '')
+                field_or_value('RENT_TYPE',0),
+                field_or_value('MAX_RENT',''),
+                field_or_value('AGE',''))
 
     start_urls = [url]
+
+    @staticmethod
+    def field_or_value(n,v):
+        return settings.INFO[n] if n in settings.INFO else v
+
+
     def parse(self, response):
         sel = Selector(response)
         res = sel.xpath('//div[@id="main_content"]//div[re:test(@id,"liste-details-ad-[0-9]+")]//a[@class="detailansicht"]/@href').extract()
@@ -61,10 +68,10 @@ class OfferSpider(scrapy.Spider):
         form_data = {
             'nachricht':settings.INFO['LETTER'],
             'u_anrede' : '1',
-            'vorname' : settings.INFO['FIRST_NAME'] or "",
-            'nachname' : settings.INFO['LAST_NAME'] or "",
-            'email': settings.INFO['EMAIL'] or "",
-            'telefon':settings.INFO['PHONE'] or "",
+            'vorname' : OfferSpider.field_or_value('FIRST_NAME',''),
+            'nachname' : OfferSpider.field_or_value('LAST_NAME',''),
+            'email': OfferSpider.field_or_value('EMAIL',''),
+            'telefon':OfferSpider.field_or_value('PHONE',''),
             'agb':"on",
             'kopieanmich':"on",
             'typ':"0",
@@ -84,10 +91,10 @@ class OfferSpider(scrapy.Spider):
         end_date = response.xpath('//*[@id="main_column"]/div[1]/div/div[3]/div[3]/p/b[2]/text()').extract_first()
 
         to_date = lambda s: datetime.strptime(s,'%d.%m.%Y')
-        start_date_lowerbound = settings.INFO['MOVE_IN_DATE_EARLIEST'] if 'MOVE_IN_DATE_EARLIEST' in settings.INFO else '1.1.1970'
-        start_date_upperbound = settings.INFO['MOVE_IN_DATE_LATEST'] if 'MOVE_IN_DATE_LATEST' in settings.INFO else '1.1.2100'
-        end_date_lowerbound   = settings.INFO['MOVE_OUT_DATE_EARLIEST'] if 'MOVE_OUT_DATE_EARLIEST' in settings.INFO else '1.1.1970'
-        end_date_upperbound   = settings.INFO['MOVE_OUT_DATE_LATEST'] if 'MOVE_OUT_DATE_LATEST' in settings.INFO else '1.1.2100'
+        start_date_lowerbound = OfferSpider.field_or_value('MOVE_IN_DATE_EARLIEST','1.1.1970')
+        start_date_upperbound = OfferSpider.field_or_value('MOVE_IN_DATE_LATEST','1.1.2100')
+        end_date_lowerbound   = OfferSpider.field_or_value('MOVE_OUT_DATE_EARLIEST','1.1.1970')
+        end_date_upperbound   = OfferSpider.field_or_value('MOVE_OUT_DATE_LATEST','1.1.2100')
         try:
             if to_date(start_date_lowerbound) < to_date(start_date) < to_date(start_date_upperbound): return # too late, i will be living under the bridge..
             if to_date(end_date_lowerbound) < to_date(end_date) < to_date(end_date_upperbound): return
