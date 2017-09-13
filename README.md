@@ -27,5 +27,7 @@ APP_ID=wggesucht MASTER_KEY=wggesucht REST_API_KEY=wggesucht PARSE_DASHBOARD_ALL
 2. <p><code>docker-compose down</code></p>
 
 ### How do I see what is crawled?
-
 visit http://localhost:4040 and you will see a dashboard. Then log in with the credential <code>wg:wggesucht</code>
+
+### Why didn't the crawler send any emails out?
+that's probably because you forgot to set the <code>DONT_SEND</code> field in the <code>INFO</code> dictionary to <code>False</code>
