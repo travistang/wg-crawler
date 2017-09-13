@@ -31,8 +31,6 @@ class OfferSpider(scrapy.Spider):
         # get some unique ad lists
         ad_lists = reduce(lambda l,r: l if r in l else l + [r],res,[])
         for r in ad_lists:
-            # yield {'ad':id}
-            # yield response.follow(r,self.ad_parse,dont_filter = True)
             yield {'ad_url': r}
     @classmethod
     def ad_parse(cls,response):
@@ -77,7 +75,6 @@ class OfferSpider(scrapy.Spider):
             print 'didnt send something...'
         else:
             print 'send something...'
-            exit()
             yield scrapy.FormRequest.from_response(response,formname = 'msg_form',formdata = form_data,errback = DatasetBroker.DatasetBroker.add_exception)
 
     # functions for dealing with some specific infos of pages

@@ -6,7 +6,6 @@ import re
 import requests
 from random import shuffle
 class DatasetBroker(object):
-    # url = "http://localhost:1337/parse/"
     url = "http://parse-server:1337/parse/"
     header = {
         "X-Parse-Application-Id": "wggesucht",
@@ -60,8 +59,7 @@ class DatasetBroker(object):
         ad = re.search(r'[0-9]{6,7}',r).group(0)
         params = {'where': json.dumps({'ad':ad})}
         url = cls.url + 'classes/' + "Ads"
-        # data = urllib.urlencode(ad)
         r = requests.get(url,params = params,headers = cls.header)
         res = json.loads(r.text)
         return len(res['results']) == 0
-        # return len(r.text) == ''
+        
