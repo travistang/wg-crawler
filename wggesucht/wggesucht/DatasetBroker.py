@@ -6,7 +6,8 @@ import re
 import requests
 from random import shuffle
 class DatasetBroker(object):
-    url = "http://localhost:1337/parse/"
+    # url = "http://localhost:1337/parse/"
+    url = "http://parse-server:1337/parse/"
     header = {
         "X-Parse-Application-Id": "wggesucht",
         "X-Parse-Master-Key": "wggesucht",

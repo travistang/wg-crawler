@@ -134,7 +134,8 @@ parse-dashboard:
   ports:
     - "4040:4040"
   #command: parse-dashboard
-#  volumes:
-#    - "parse-dashboard-config.json:/src/Parse-Dashboard/parse-dashboard-config.json"
-
-# vim:set et ts=2 sw=2:
+crawler:
+  build: ./wggesucht
+  links:
+    - parse-server
+  command: "yes" # intended to do nothing but blocks the container from exiting...

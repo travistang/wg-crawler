@@ -32,6 +32,9 @@ class RedirectHandler(object):
 		print 'processing request {}, using proxy {}'.format(request.url,request.meta['proxy'])
 
 	def process_response(self,request,response,spider):
+		if 'wg-gesucht.de' not in request.url: return response
+		if response.status not in [200,303]:
+			DatasetBroker.DatasetBroker.add_exception("status {} encountered".format(response.status))
 		return response
 
 	def process_exception(self,request,exception,spider):
