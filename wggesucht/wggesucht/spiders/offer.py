@@ -17,9 +17,10 @@ class OfferSpider(scrapy.Spider):
     name = 'offer'
     allowed_domains = ['www.wg-gesucht.de']
     field_or_value = lambda n,v: settings.INFO[n] if n in settings.INFO else v
-    url = 'http://www.wg-gesucht.de/en/wg-zimmer-in-Muenchen.90.0.1.0.html?offer_filter=1&sort_column=0&city_id=90&category=0&rent_type={}&rMax={}&wgSea=2&wgAge={}&sin=1&exc=2'.format(
+    url = 'http://www.wg-gesucht.de/en/wg-zimmer-in-Muenchen.90.0.1.0.html?offer_filter=1&sort_column=0&city_id=90&category=0&rent_type={}&rMax={}&wgSea={}&wgAge={}&sin=1&exc=2'.format(
                 field_or_value('RENT_TYPE',0),
                 field_or_value('MAX_RENT',''),
+                field_or_value('GENDER',0),
                 field_or_value('AGE',''))
 
     start_urls = [url]
@@ -96,8 +97,9 @@ class OfferSpider(scrapy.Spider):
         end_date_lowerbound   = OfferSpider.field_or_value('MOVE_OUT_DATE_EARLIEST','1.1.1970')
         end_date_upperbound   = OfferSpider.field_or_value('MOVE_OUT_DATE_LATEST','1.1.2100')
         try:
-            if to_date(start_date_lowerbound) < to_date(start_date) < to_date(start_date_upperbound): return # too late, i will be living under the bridge..
-            if to_date(end_date_lowerbound) < to_date(end_date) < to_date(end_date_upperbound): return
+            if not (to_date(start_date_lowerbound) <= to_date(start_date) <= to_date(start_date_upperbound)): return False # too late, i will be living under the bridge..
+            if not (to_date(end_date_lowerbound) <= to_date(end_date) <= to_date(end_date_upperbound)): return False
+            return True
         except:
             # some of them are just not date...
             # do nothing... just keep going
