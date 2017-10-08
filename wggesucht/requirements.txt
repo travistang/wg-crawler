@@ -1,0 +1,4 @@
+scrapy
+scrapy-fake-useragent
+-e git+https://github.com/milesrichardson/ParsePy.git#egg=parse_rest
+requests

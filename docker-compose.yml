@@ -134,8 +134,8 @@ parse-dashboard:
   ports:
     - "4040:4040"
   #command: parse-dashboard
-crawler:
-  build: ./wggesucht
-  links:
-    - parse-server
-  command: "python d.py"
+#crawler:
+#  build: ./wggesucht
+#  links:
+#    - parse-server
+#  command: "python d.py"
