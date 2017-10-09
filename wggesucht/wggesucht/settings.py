@@ -111,7 +111,7 @@ INFO = {
       "EMAIL": "foo@bar.baz",
       "PHONE": "12345",
       "LETTER": "Some long texts you want to tell the landlords...",
-      "GENDER": 0 # 0 or 1 or 2, where 0 is doesn't matter, 1 is female and 2 is male
+      "GENDER": 0, # 0 or 1 or 2, where 0 is doesn't matter, 1 is female and 2 is male
       # The following dates should be of format "DD.MM.YYYY"
       "MOVE_IN_DATE_EARLIEST": "1.10.2017",
       "MOVE_IN_DATE_LATEST": "10.10.2017",
