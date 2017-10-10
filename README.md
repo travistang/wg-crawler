@@ -16,7 +16,7 @@ A script for crawling ads
 cd wg-crawler
 </code></p>
 <p><code>
-APP_ID=wggesucht MASTER_KEY=wggesucht REST_API_KEY=wggesucht PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=1 ALLOW_INSECURE_HTTP=1 PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=1 ALLOW_CLIENT_CLASS_CREATION=1 SERVER_URL=http://localhost:1337/parse docker-compose up -d --build
+USER1=wggesucht USER1_PASSWORD=wggesucht APP_ID=wggesucht MASTER_KEY=wggesucht REST_API_KEY=wggesucht PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=1 ALLOW_INSECURE_HTTP=1 PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=1 ALLOW_CLIENT_CLASS_CREATION=1 SERVER_URL=http://localhost:1337/parse docker-compose up -d --build
 </code></p>
 3. You should see emails from WG-Gesucht that informs you you have sent out email to the landlords.
 

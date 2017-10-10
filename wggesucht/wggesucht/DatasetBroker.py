@@ -3,8 +3,10 @@ import urllib2
 import json
 from scrapy.exceptions import IgnoreRequest
 import re
+import os
 import requests
 from random import shuffle
+
 class DatasetBroker(object):
     url = "http://parse-server:1337/parse/"
     header = {
@@ -12,7 +14,6 @@ class DatasetBroker(object):
         "X-Parse-Master-Key": "wggesucht",
         "Content-Type": "application/json",
     }
-
     @classmethod
     def post(cls,url,data):
         data = json.dumps(data)
@@ -62,4 +63,3 @@ class DatasetBroker(object):
         r = requests.get(url,params = params,headers = cls.header)
         res = json.loads(r.text)
         return len(res['results']) == 0
-        
