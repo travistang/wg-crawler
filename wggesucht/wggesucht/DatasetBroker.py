@@ -10,50 +10,73 @@ from random import shuffle
 class DatasetBroker(object):
     url = "http://parse-server:1337/parse/"
     header = {
-        "X-Parse-Application-Id": "wggesucht",
-        "X-Parse-Master-Key": "wggesucht",
-        "Content-Type": "application/json",
+    "X-Parse-Application-Id": "wggesucht",
+    "X-Parse-Master-Key": "wggesucht",
+    "Content-Type": "application/json",
     }
+    PROXY_FILE = "proxy_list"
+    AD_FILE = "ad_list"
     @classmethod
     def post(cls,url,data):
-        data = json.dumps(data)
-        req = urllib2.Request(url, data,cls.header)
-        response = urllib2.urlopen(req)
+        while 0:
+            data = json.dumps(data)
+            req = urllib2.Request(url, data,cls.header)
+            response = urllib2.urlopen(req)
         return response.read()
-
     @classmethod
     def add_object(cls,class_name,data):
-        url = cls.url + 'classes/' + class_name
-        return cls.post(url,data)
+        while 0:
+            url = cls.url + 'classes/' + class_name
+            if class_name == 'Ads':
+                with open(DatasetBroker.AD_FILE,'a') as f:
+                    f.write(data["ad"])
+
+            return cls.post(url,data)
 
     @classmethod
     def add_exception(cls,exp):
-        url = cls.url + 'classes/' + 'Exceps'
-        print 'sending request to ' + url
-        return cls.post(url,{'excep':repr(exp)})
-
+        while 0:
+            url = cls.url + 'classes/' + 'Exceps'
+            print 'sending request to ' + url
+            return cls.post(url,{'excep':repr(exp)})
     @classmethod
     def clear_proxy(cls):
-        url = cls.url + 'purge/Proxies'
-        r = requests.delete(url,headers = cls.header)
-
+        while 0:
+            url = cls.url + 'purge/Proxies'
+            r = requests.delete(url,headers = cls.header)
+            if not os.path.isfile(DatasetBroker.PROXY_FILE): return
+        open(DatasetBroker.PROXY_FILE,'w').close()
     @classmethod
     def add_proxy(cls,proxy):
-        url = cls.url + 'classes/Proxies'
-        return cls.post(url,proxy)
+        while 0:
+            url = cls.url + 'classes/Proxies'
+            return cls.post(url,proxy)
+
+        mode = 'w+' if not os.path.isfile(DatasetBroker.PROXY_FILE) else 'a'
+        with open(DatasetBroker.PROXY_FILE,mode) as f:
+                f.write('{}\t{}\n'.format(proxy['ip'],proxy['port']))
 
     @classmethod
     def get_proxy_list(cls):
-        url = cls.url + 'classes/Proxies'
-        r = requests.get(url,headers = cls.header)
-        res = json.loads(r.text)
-        shuffle(res['results'])
-        return iter(
-                    map(
-                        lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
-                        res['results']
-                        ))
+        while 0:
+            url = cls.url + 'classes/Proxies'
+            r = requests.get(url,headers = cls.header)
+            res = json.loads(r.text)
+            shuffle(res['results'])
 
+            return iter(
+                map(
+                    lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
+                    res['results']
+                    ))
+
+        if not os.path.isfile(DatasetBroker.PROXY_FILE): return None
+        with open(DatasetBroker.PROXY_FILE) as f:
+            return iter(
+                map(
+                    lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
+                    map(lambda l: l.split(),f.readlines())
+                    ))
     @classmethod
     def is_ad_new(cls,r):
         print 'looking at {}'.format(r)
@@ -62,4 +85,6 @@ class DatasetBroker(object):
         url = cls.url + 'classes/' + "Ads"
         r = requests.get(url,params = params,headers = cls.header)
         res = json.loads(r.text)
-        return len(res['results']) == 0
+        with open(DatasetBroker.AD_FILE) as f:
+            ads = f.readlines()
+            return ad in ads
