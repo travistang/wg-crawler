@@ -31,8 +31,8 @@ class LoggerPipeline(object):
             return item
         elif 'ad_url' in item:
             # check if the item should be followed...
-            if DatasetBroker.DatasetBroker.is_ad_new(item['ad_url']):
-                aid = re.search(r'[0-9]{6,7}',item['ad_url']).group(0)
+            aid = re.search(r'[0-9]{6,7}',item['ad_url']).group(0)
+            if DatasetBroker.DatasetBroker.is_ad_new(aid):
                 self.crawler.engine.crawl(
                     scrapy.Request(
                         url = 'https://www.wg-gesucht.de/{}.html'.format(aid),

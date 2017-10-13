@@ -18,73 +18,43 @@ class DatasetBroker(object):
     AD_FILE = "ad_list"
     @classmethod
     def post(cls,url,data):
-        while 0:
-            data = json.dumps(data)
-            req = urllib2.Request(url, data,cls.header)
-            response = urllib2.urlopen(req)
-        return response.read()
+        pass
     @classmethod
     def add_object(cls,class_name,data):
-        while 0:
-            url = cls.url + 'classes/' + class_name
-            if class_name == 'Ads':
-                with open(DatasetBroker.AD_FILE,'a') as f:
-                    f.write(data["ad"])
-
-            return cls.post(url,data)
+        print 'writing...'
+        with open(DatasetBroker.AD_FILE,'a') as f:
+            f.write("{}\n".format(data["ad"]))
 
     @classmethod
     def add_exception(cls,exp):
-        while 0:
-            url = cls.url + 'classes/' + 'Exceps'
-            print 'sending request to ' + url
-            return cls.post(url,{'excep':repr(exp)})
+        pass
+        
     @classmethod
     def clear_proxy(cls):
-        while 0:
-            url = cls.url + 'purge/Proxies'
-            r = requests.delete(url,headers = cls.header)
-            if not os.path.isfile(DatasetBroker.PROXY_FILE): return
         open(DatasetBroker.PROXY_FILE,'w').close()
     @classmethod
     def add_proxy(cls,proxy):
-        while 0:
-            url = cls.url + 'classes/Proxies'
-            return cls.post(url,proxy)
-
         mode = 'w+' if not os.path.isfile(DatasetBroker.PROXY_FILE) else 'a'
         with open(DatasetBroker.PROXY_FILE,mode) as f:
                 f.write('{}\t{}\n'.format(proxy['ip'],proxy['port']))
 
     @classmethod
     def get_proxy_list(cls):
-        while 0:
-            url = cls.url + 'classes/Proxies'
-            r = requests.get(url,headers = cls.header)
-            res = json.loads(r.text)
-            shuffle(res['results'])
-
-            return iter(
-                map(
-                    lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
-                    res['results']
-                    ))
-
         if not os.path.isfile(DatasetBroker.PROXY_FILE): return None
         with open(DatasetBroker.PROXY_FILE) as f:
+            proxies = f.readlines()
+            shuffle(proxies)
             return iter(
                 map(
-                    lambda prox:'https://{}:{}'.format(prox['ip'],prox['port']),
-                    map(lambda l: l.split(),f.readlines())
-                    ))
+                    lambda prox:'https://{}:{}'.format(prox[0],prox[1]),
+                    map(lambda l: l.split('\t'),proxies)
+                ))
     @classmethod
     def is_ad_new(cls,r):
-        print 'looking at {}'.format(r)
-        ad = re.search(r'[0-9]{6,7}',r).group(0)
-        params = {'where': json.dumps({'ad':ad})}
-        url = cls.url + 'classes/' + "Ads"
-        r = requests.get(url,params = params,headers = cls.header)
-        res = json.loads(r.text)
+        if not os.path.isfile(DatasetBroker.AD_FILE):
+            open(DatasetBroker.AD_FILE,'a').close()
+            return True # because not even a single ad has been seen before..
+        # extract the id here...
         with open(DatasetBroker.AD_FILE) as f:
-            ads = f.readlines()
-            return ad in ads
+            ads = map(lambda l: l.replace('\n','').strip(),f.readlines())
+            return r not in ads

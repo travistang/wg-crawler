@@ -9,6 +9,9 @@ import re
 
 class RedirectHandler(object):
 
+        def __init__(self):
+	    self.proxies = DatasetBroker.DatasetBroker.get_proxy_list()
+
 	def get_random_proxy(self):
 		return self.proxies.next()
 
@@ -21,19 +24,19 @@ class RedirectHandler(object):
 		if 'sslproxies.org' in request.url:
 			return
 		#  gather list of proxies if there isnt any
-		if not hasattr(self,'proxies'):
-			self.proxies = DatasetBroker.DatasetBroker.get_proxy_list()
+#		if not hasattr(self,'proxies'):
+#			self.proxies = DatasetBroker.DatasetBroker.get_proxy_list()
 
 		request.meta['proxy'] = self.get_random_proxy()
 		# return request
 		print 'processing request {}, using proxy {}'.format(request.url,request.meta['proxy'])
 
 	def process_response(self,request,response,spider):
-		if 'wg-gesucht.de' not in request.url: return response
-		if response.status not in [200,303]:
-			DatasetBroker.DatasetBroker.add_exception("status {} encountered".format(response.status))
-			return response
-		return response
+                if 'wg-gesucht.de' not in request.url: return response
+                if response.status not in [200,303]:
+                        DatasetBroker.DatasetBroker.add_exception("status {} encountered".format(response.status))
+                        return response
+                return response
 
 	def process_exception(self,request,exception,spider):
 		# log the exception
